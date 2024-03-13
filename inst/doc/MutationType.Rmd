@@ -1,0 +1,98 @@
+---
+title: "MutationType: A package to identify the mutations types of SNVs"
+author:
+- name: "Giuseppe Barranco"
+  affiliation: Master's Degree student in BCG Polimi/Unimi 10868963
+  email: giuseppe.barranco@studenti.unimi.it
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{A brief introduction to decompTumor2Sig}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::pdf_document
+---
+
+# Introduction
+This package, made principally of three functions, aims to find the Single-Nucleotide-Variants, the relative genomic sequence and eventually perform some general visual statistics. 
+
+## Biological Background
+A change of one base with respect to the reference genome is considered a single nulceotide mutation. Some of these variants however are present in different prcentages in the whole population indeed are also called SN-polymorphism. It can happen that a variant cam be rare and often is labeled as mutation. 
+
+## This package
+There are three main functions: 
+
+* seekSNVs(vcffile, referenceGenome) which takes a vcf file and a reference genome as input and find among all the variants only the single nucleotide. It then return a df which some infomrations (name, chr, ref allele, alternative)
+* seekMutAndSeq(df, contextLenght=3, refGen) which takes in input a df, that should be the output of the first function, that has the position of the SNVs; A context length which define the total length of the sequences that has to retrieve on the left and right of the reference genome with respect to the position of the SNVs.
+* generalStat compute the frequency of the two types of mutations, (to reduce the redundancy we consider only C,T as the reverse strand) and also the frequency for equal whole sequences. 
+
+\newpage
+
+# Usage example
+
+## seekSNVs
+You can either provide a path to file or a vcf file to this function. To read it it used the function _readVcf_.  Using the *GenomicRanges::width* function the vcf file can be filtered. 
+We want to select the variant where there is only one nucleotide for the reference and also for the alternative. This is basically how to distinguish snv, indels, duplication. 
+Here a file provided from the _VariantAnnotation_ package will be used. 
+```{r echo = FALSE, eval=TRUE}
+
+library(BiocStyle)
+library(knitr)
+```
+
+```{r echo = FALSE, eval=TRUE,message=FALSE}
+library(MutationType)
+library(VariantAnnotation)
+library(BSgenome.Hsapiens.UCSC.hg38)
+```
+
+
+```{r echo = TRUE, eval=TRUE, results = 'asis'}
+vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+vcffile <- readVcf(vcffile,"hg38")
+setOfSNVs <- seekSNVs(vcffile, "hg38")
+```
+
+```{r echo = FALSE, eval=TRUE, results = 'asis'}
+knitr::kable(setOfSNVs[1:10,])
+```
+
+
+## seekMutAndSeq
+Here, after you get the SNVs and the relative positions it is possible to run this function which find the genomic sequence with the given length input of the given reference genome file.
+It can happen that the context_length can produce somehow ranges that are over the actually length of the chromosome. Therefore in this function is implemented a check that ensure this. Also if different chromosome are provided. 
+Here the ref genome is the "Full genomic sequences for Homo sapiens as provided by UCSC (genome hg38, based on assembly GRCh38.p14 since 2023/01/31). The sequences are stored in DNAString objects".
+[https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html] 
+
+```{r echo = TRUE, eval=TRUE, results = 'asis'}
+setOfSNVsInfo <- seekMutAndSeq(setOfSNVs, contextLength = 3, Hsapiens)
+```
+
+```{r echo = FALSE, eval=TRUE, results = 'asis'}
+knitr::kable(setOfSNVsInfo[1:10,])
+```
+
+
+
+## generalStart
+This function returns a list with two tables and two plots. There are frequency for the nucleotide mutations and also for the whole context sequence 
+```{r echo = TRUE, eval=TRUE, results = 'asis', warning=FALSE}
+results <- generalStat(setOfSNVsInfo)
+```
+
+```{r echo = FALSE, eval=TRUE, results = 'asis', warning=FALSE}
+knitr::kable(results[[1]], align = "c")
+results[[2]]
+```
+
+\newpage
+
+```{r echo = FALSE, eval=TRUE, results = 'asis', warning=FALSE}
+knitr::kable(results[[3]][1:10,])
+results[[4]]
+```
+
+```{r echo = FALSE, eval=TRUE}
+sessionInfo()
+```
+

@@ -1,0 +1,24 @@
+Package: MutationType
+Type: Package
+Title: Find The SNVs For A Vcfile, The Relative Genomic Sequence,
+        Mutation Types And Frequency
+Version: 1.0.0
+Authors@R: 
+    person("Giuseppe", "Barranco", , "giuseppe.barranco@studenti.unimi.it", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-6724-5376"))
+Description: This package is made of 3 functions and its aim is to take a set of SNVs from a VCF file. SNVs are Single nucleotide variant so they can be detected by the fact that the reference and alternative allele are 1 letter only. After running the function the user will get the position of this changes and providing the length, it can be retrieved the genomica sequence from a genomic reference. The last function basically group the information and the type of mutation providing two plots and two table with the found mutations type.
+License: GPL-3
+Encoding: UTF-8
+biocViews: Software, Genetics, Epigenetics, Technology,
+        GenomeAnnotation, Sequencing, Coverage, VariantAnnotation,
+        SequenceMatching, DataImport
+Depends:
+        ggplot2,VariantAnnotation,BSgenome,GenomicRanges,methods,GenomeInfoDb,MatrixGenerics,BSgenome.Hsapiens.UCSC.hg38
+Suggests: knitr, rmarkdown, BiocStyle, testthat
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+NeedsCompilation: no
+Packaged: 2024-02-04 22:53:23 UTC; giuseppe
+Author: Giuseppe Barranco [aut, cre] (<https://orcid.org/0009-0004-6724-5376>)
+Maintainer: Giuseppe Barranco <giuseppe.barranco@studenti.unimi.it>
